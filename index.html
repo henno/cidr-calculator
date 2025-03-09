@@ -15,20 +15,18 @@
             display: none;
         }
 
-        * {
-            box-sizing: border-box;
-        }
-
-        body {
+        html, body {
             margin: 0;
             padding: 0;
             line-height: 1.6;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
             Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
             background-color: #f8f8f8;
+            overflow-x: hidden;
         }
 
         .wrapper {
+            width: 100%;
             max-width: 1200px;
             margin: 0 auto;
             padding: 20px;
@@ -150,7 +148,7 @@
             padding: 6px 10px;
             text-align: center;
             font-family: monospace;
-            white-space: nowrap;
+            white-space: nowrap; /* We'll override this below on small screens */
             color: #999;
         }
 
@@ -195,8 +193,72 @@
             /* Empty: remove or style if desired */
         }
 
-        .hosts-container td:nth-child(2), th:nth-child(2) {
+        .hosts-container td:nth-child(2),
+        .hosts-container th:nth-child(2) {
             text-align: left;
+        }
+
+        /* =============================
+           MOBILE-FRIENDLY MEDIA QUERY
+           ============================= */
+        @media (max-width: 576px) {
+            /* Reduce overall padding to save space */
+            .wrapper {
+                padding: 10px;
+            }
+
+            /* Make the heading smaller */
+            h1 {
+                font-size: 1.5rem;
+            }
+
+            /* Shrink the octet group width from 80 -> 60 */
+            .octet-group {
+                width: 60px;
+            }
+
+            /* Shrink the input boxes further */
+            .octet-input,
+            .cidr-input {
+                width: 45px;
+                font-size: 13px;
+                padding: 3px;
+            }
+
+            /* Shrink the bits in binary display */
+            .bit {
+                width: 7px;
+                font-size: 7px;
+            }
+
+            .octet-bits {
+                font-size: 14px;
+            }
+
+            /* Tighter separators */
+            .separator {
+                font-size: 16px;
+                padding: 0 1px;
+            }
+
+            /* Smaller summary table text */
+            .summary-table th,
+            .summary-table td {
+                font-size: 14px;
+            }
+
+            /* Let host table text wrap if needed to avoid overflow; also smaller font */
+            .hosts-container th,
+            .hosts-container td {
+                white-space: normal;
+                font-size: 10px;
+            }
+
+            /* Shrink badges further on mobile */
+            .badge {
+                font-size: 0.65rem;
+                padding: 2px 4px;
+            }
         }
     </style>
 </head>
@@ -434,34 +496,33 @@
                         :key="index"
                 >
                     <td v-html="comb.binaryHTML"></td>
-                    <!-- Removed class="d-flex align-items-center" here -->
                     <td>
                         <!-- IP in decimal form -->
                         <span v-html="comb.decimalHTML"></span>
 
                         <!-- /32 scenario: single IP => Single Host badge -->
                         <template v-if="cidrPrefix === 32">
-              <span
-                      class="badge bg-primary ms-2"
-                      data-bs-toggle="tooltip"
-                      data-bs-placement="top"
-                      title="A /32 network has exactly one IP address—no separate network or broadcast."
-              >
-                Single Host
-              </span>
+                <span
+                        class="badge bg-primary ms-2"
+                        data-bs-toggle="tooltip"
+                        data-bs-placement="top"
+                        title="A /32 network has exactly one IP address—no separate network or broadcast."
+                >
+                  Single Host
+                </span>
                         </template>
 
                         <!-- /31 scenario: show Endpoint #1, Endpoint #2 -->
                         <template v-else-if="cidrPrefix === 31">
-              <span
-                      v-if="index === 0"
-                      class="badge bg-primary ms-2"
-                      data-bs-toggle="tooltip"
-                      data-bs-placement="top"
-                      title="First IP in a /31 subnet is used by the first endpoint."
-              >
-                Endpoint #1
-              </span>
+                <span
+                        v-if="index === 0"
+                        class="badge bg-primary ms-2"
+                        data-bs-toggle="tooltip"
+                        data-bs-placement="top"
+                        title="First IP in a /31 subnet is used by the first endpoint."
+                >
+                  Endpoint #1
+                </span>
                             <span
                                     v-if="index === displayedHostCombinations.length - 1"
                                     class="badge bg-primary ms-2"
@@ -469,30 +530,30 @@
                                     data-bs-placement="top"
                                     title="Second IP in a /31 subnet is used by the second endpoint."
                             >
-                Endpoint #2
-              </span>
+                  Endpoint #2
+                </span>
                         </template>
 
                         <!-- All other prefixes: Network / Gateway / Broadcast -->
                         <template v-else>
-              <span
-                      v-if="index === 0"
-                      class="badge bg-danger ms-2"
-                      data-bs-toggle="tooltip"
-                      data-bs-placement="top"
-                      title="Used to refer to the entire network. Can't be assigned to any host"
-              >
-                Network
-              </span>
+                <span
+                        v-if="index === 0"
+                        class="badge bg-danger ms-2"
+                        data-bs-toggle="tooltip"
+                        data-bs-placement="top"
+                        title="Used to refer to the entire network. Can't be assigned to any host"
+                >
+                  Network
+                </span>
                             <span
                                     v-if="index === 1"
                                     class="badge bg-info ms-2"
                                     data-bs-toggle="tooltip"
                                     data-bs-placement="top"
-                                    title="This first usable IP address in the range is usually, but not always, assigned to a gateway to other networks (a router)"
+                                    title="This first usable IP address in the range is often assigned to a gateway (router)."
                             >
-                Gateway
-              </span>
+                  Gateway
+                </span>
                             <span
                                     v-if="index === displayedHostCombinations.length - 1"
                                     class="badge bg-danger ms-2"
@@ -500,12 +561,11 @@
                                     data-bs-placement="top"
                                     title="This IP can be used to send a packet to the subnet that all hosts can see"
                             >
-                Broadcast
-              </span>
+                  Broadcast
+                </span>
                         </template>
                     </td>
                 </tr>
-
                 </tbody>
             </table>
             <button
@@ -543,9 +603,7 @@
           const binary = octet.toString(2).padStart(8, '0')
           let bits = []
           for (let j = 0; j < 8; j++) {
-            const masked =
-              this.cidrPrefix > i * 8 &&
-              j < this.cidrPrefix - i * 8
+            const masked = this.cidrPrefix > i * 8 && j < this.cidrPrefix - i * 8
             bits.push({ bit: binary[j], masked })
           }
           return bits
@@ -590,7 +648,7 @@
       },
       totalHosts () {
         const total = Math.pow(2, 32 - this.cidrPrefix)
-        // /31 => 2 usable hosts (RFC 3021), /32 => 1 host
+        // For /31 => 2 usable hosts (RFC 3021), /32 => 1 host
         return this.cidrPrefix <= 30 ? total - 2 : total
       },
       networkInt () {
@@ -664,22 +722,20 @@
           let octetEnd = octetStart + 8
           let octet = binStr.slice(octetStart, octetEnd)
 
+          // Which bits belong to the network portion vs host portion
           if (octetEnd <= this.cidrPrefix) {
-            // Entire octet is network portion
             result += `<span style="background-color:#c8c8c8;">${octet}</span>`
           } else if (octetStart >= this.cidrPrefix) {
-            // Entire octet is host portion
             result += `<span style="color:black;">${octet}</span>`
           } else {
-            // Partially masked
             let netPart = octet.slice(0, this.cidrPrefix - octetStart)
             let hostPart = octet.slice(this.cidrPrefix - octetStart)
             result += `<span style="background-color:#c8c8c8;">${netPart}</span>` +
               `<span style="color:black;">${hostPart}</span>`
           }
 
+          // Add a dot between octets
           if (i < 3) {
-            // Dot between octets
             if ((i + 1) * 8 <= this.cidrPrefix) {
               result += `<span style="background-color:#c8c8c8;">.</span>`
             } else {
@@ -702,18 +758,14 @@
           const endBit = startBit + 8
 
           if (this.cidrPrefix >= endBit) {
-            // Entire octet = network portion
             result += `<span style="background-color: #c8c8c8;">${octets[i]}</span>`
           } else if (this.cidrPrefix <= startBit) {
-            // Entire octet = host portion
             result += `<span style="color: black;">${octets[i]}</span>`
           } else {
-            // Partially masked
             result += `<span style="background-color: inherit;">${octets[i]}</span>`
           }
 
           if (i < 3) {
-            // Dot between octets
             if (this.cidrPrefix >= (i + 1) * 8) {
               result += `<span style="background-color: #c8c8c8;">.</span>`
             } else if (this.cidrPrefix <= i * 8) {
@@ -747,7 +799,6 @@
         } else if (this.cidrPrefix <= start) {
           return { 'background-color': 'inherit' }
         } else {
-          // Partly masked octet
           const networkBits = this.cidrPrefix - start
           const percentage = (networkBits / 8) * 100
           return {
@@ -775,7 +826,6 @@
     },
     watch: {
       cidrPrefix () {
-        // Update the tooltip content for the CIDR input
         if (this.tooltipInstance) {
           this.tooltipInstance.setContent({
             '.tooltip-inner': this.netmask.join('.'),
