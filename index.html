@@ -1,576 +1,790 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>CIDR Calculator</title>
     <!-- Include Bootstrap CSS for tooltip styling -->
     <link
-      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
-      rel="stylesheet"
+            href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+            rel="stylesheet"
     />
     <style>
-      * {
-        box-sizing: border-box;
-      }
-      body {
-        margin: 0;
-        padding: 0;
-        line-height: 1.6;
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-          Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
-        background-color: #f8f8f8;
-      }
-      .wrapper {
-        max-width: 1200px;
-        margin: 0 auto;
-        padding: 20px;
-      }
-      h1 {
-        text-align: center;
-        margin: 20px 0;
-        font-size: 2rem;
-        color: #333;
-      }
-      .inputs-card {
-        background-color: #fff;
-        border: 1px solid #ddd;
-        border-radius: 6px;
-        padding: 15px;
-        margin-bottom: 20px;
-      }
-      .binary-visualization {
-        display: table;
-        margin: 0 auto;
-        border-spacing: 0;
-      }
-      .binary-row {
-        display: table-row;
-      }
-      .octet-group {
-        display: table-cell;
-        text-align: center;
-        padding: 0;
-        width: 80px;
-        vertical-align: middle;
-      }
-      .octet-input,
-      .cidr-input {
-        width: 80px;
-        text-align: center;
-        font-size: 16px;
-        padding: 5px;
-        margin: 2px 0;
-      }
-      .separator {
-        display: table-cell;
-        text-align: center;
-        vertical-align: middle;
-        font-size: 20px;
-        font-weight: bold;
-        padding: 0 5px;
-      }
-      .octet-bits {
-        font-family: monospace;
-        font-size: 16px;
-        white-space: pre;
-      }
-      .bit {
-        display: inline-block;
-        width: 10px;
-        text-align: center;
-      }
-      .ip-bit.masked {
-        background-color: #c8c8c8;
-        color: inherit;
-      }
-      .unmasked {
-        color: #f44336;
-      }
-      .masked {
-        color: #999;
-      }
-      .netmask-display {
-        text-align: center;
-        font-family: "Roboto Mono", monospace;
-        font-size: 14px;
-        margin-top: 5px;
-      }
-      .summary-table {
-        width: 100%;
-        border-collapse: collapse;
-        margin-bottom: 20px;
-      }
-      .summary-table th {
-        text-align: left;
-        white-space: nowrap;
-        font-weight: bold;
-        color: #333;
-        padding: 4px 8px;
-        width: 130px;
-      }
-      .summary-table td {
-        padding: 4px 8px;
-        font-family: monospace;
-        color: #000;
-      }
-      .hosts-container h2 {
-        text-align: center;
-        margin: 20px 0 15px;
-        font-family: "Roboto Mono", monospace;
-      }
-      .hosts-container table {
-        width: 100%;
-        border-collapse: collapse;
-      }
-      .hosts-container th,
-      .hosts-container td {
-        border: 1px solid #ccc;
-        padding: 6px 10px;
-        text-align: center;
-        font-family: monospace;
-        white-space: nowrap;
-        color: #555;
-      }
-      .hosts-container th {
-        background-color: #eee;
-      }
-      .show-more-btn {
-        display: block;
-        margin: 10px auto;
-        padding: 6px 12px;
-        font-size: 14px;
-        border: 1px solid #999;
-        border-radius: 4px;
-        background-color: #f0f0f0;
-        cursor: pointer;
-      }
-      .show-more-btn:hover {
-        background-color: #e0e0e0;
-      }
-      .layout {
-        display: flex;
-        flex-direction: row;
-        align-items: flex-start;
-        gap: 20px;
-        flex-wrap: wrap;
-      }
-      .main {
-        flex: 1 1 auto;
-        min-width: 0;
-      }
-      .sidebar {
-        width: 300px;
-        flex: none;
-        border-left: 1px solid #ccc;
-        background-color: #fafafa;
-        padding: 20px;
-      }
-      @media (max-width: 900px) {
-        .layout {
-          flex-direction: column;
+        /* Vue Cloak: Hide until Vue is loaded */
+        [v-cloak] {
+            display: none;
         }
-        .sidebar {
-          border-left: none;
-          border-top: 1px solid #ccc;
-          width: auto;
+
+        * {
+            box-sizing: border-box;
         }
-      }
+
+        body {
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+            Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+            background-color: #f8f8f8;
+        }
+
+        .wrapper {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            margin: 20px 0;
+            font-size: 2rem;
+            color: #333;
+        }
+
+        .inputs-card {
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+
+        .binary-visualization {
+            display: table;
+            margin: 0 auto;
+            border-spacing: 0;
+        }
+
+        .binary-row {
+            display: table-row;
+        }
+
+        .octet-group {
+            display: table-cell;
+            text-align: center;
+            padding: 0;
+            width: 80px;
+            vertical-align: middle;
+        }
+
+        .octet-input,
+        .cidr-input {
+            width: 80px;
+            text-align: center;
+            font-size: 16px;
+            padding: 5px;
+            margin: 2px 0;
+            border: 1px solid #ccc;
+        }
+
+        .separator {
+            display: table-cell;
+            text-align: center;
+            vertical-align: middle;
+            font-size: 20px;
+            font-weight: bold;
+            padding: 0 5px;
+        }
+
+        .octet-bits {
+            font-family: monospace;
+            font-size: 16px;
+            white-space: pre;
+        }
+
+        .bit {
+            display: inline-block;
+            width: 10px;
+            text-align: center;
+            font-size: xx-small;
+        }
+
+        .ip-bit.masked {
+            background-color: #c8c8c8;
+            color: inherit;
+        }
+
+        .unmasked {
+            color: black;
+        }
+
+        .masked {
+            color: #999;
+        }
+
+        .summary-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        .summary-table th {
+            text-align: left;
+            white-space: nowrap;
+            font-weight: bold;
+            color: #333;
+            padding: 4px 8px;
+            width: 130px;
+        }
+
+        .summary-table td {
+            padding: 4px 8px;
+            font-family: monospace;
+            color: #000;
+        }
+
+        .hosts-container h2 {
+            text-align: center;
+            margin: 20px 0 15px;
+            font-family: "Roboto Mono", monospace;
+        }
+
+        .hosts-container table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .hosts-container th,
+        .hosts-container td {
+            border: 1px solid #ccc;
+            padding: 6px 10px;
+            text-align: center;
+            font-family: monospace;
+            white-space: nowrap;
+            color: #999;
+        }
+
+        .hosts-container th {
+            background-color: #eee;
+        }
+
+        .show-more-btn {
+            display: block;
+            margin: 10px auto;
+            padding: 6px 12px;
+            font-size: 14px;
+            border: 1px solid #999;
+            border-radius: 4px;
+            background-color: #f0f0f0;
+            cursor: pointer;
+        }
+
+        .show-more-btn:hover {
+            background-color: #e0e0e0;
+        }
+
+        .legend {
+            margin: 10px auto; /* top/bottom margin, horizontally centered */
+            white-space: nowrap; /* prevent text wrapping */
+        }
+
+        .legend-swatch {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            margin-right: 8px;
+            vertical-align: middle;
+            border: 1px solid #999;
+        }
+
+        .legend-swatch-network {
+            background-color: #c8c8c8;
+        }
+
+        .legend-swatch-host {
+            /* Empty: remove or style if desired */
+        }
+
+        .hosts-container td:nth-child(2), th:nth-child(2) {
+            text-align: left;
+        }
     </style>
-  </head>
-  <body>
-    <div id="app">
-      <div class="wrapper">
+</head>
+<body>
+<div id="app" v-cloak>
+    <div class="wrapper">
         <h1>CIDR Calculator</h1>
         <div class="inputs-card">
-          <div class="binary-visualization">
-            <div class="binary-row">
-              <div class="octet-group">
-                <input
-                  type="text"
-                  class="octet-input"
-                  v-model.number="octets[0]"
-                  @input="calculateCIDR"
-                  @paste="handlePaste"
-                />
-              </div>
-              <div class="separator">.</div>
-              <div class="octet-group">
-                <input
-                  type="text"
-                  class="octet-input"
-                  v-model.number="octets[1]"
-                  @input="calculateCIDR"
-                />
-              </div>
-              <div class="separator">.</div>
-              <div class="octet-group">
-                <input
-                  type="text"
-                  class="octet-input"
-                  v-model.number="octets[2]"
-                  @input="calculateCIDR"
-                />
-              </div>
-              <div class="separator">.</div>
-              <div class="octet-group">
-                <input
-                  type="text"
-                  class="octet-input"
-                  v-model.number="octets[3]"
-                  @input="calculateCIDR"
-                />
-              </div>
-              <div class="separator">
-                <span>/</span>
-              </div>
-              <div class="octet-group">
-                <!-- Tooltip is now attached to the input field below -->
-                <input
-                  type="number"
-                  class="cidr-input"
-                  v-model.number="cidrPrefix"
-                  min="0"
-                  max="32"
-                  @input="calculateCIDR"
-                  data-bs-toggle="tooltip"
-                  data-bs-placement="top"
-                  :title="netmask.join('.')"
-                />
-              </div>
+            <!-- Main Calculator UI -->
+            <div class="binary-visualization">
+                <!-- First row: Input fields -->
+                <div class="binary-row">
+                    <div class="octet-group">
+                        <input
+                                type="text"
+                                class="octet-input"
+                                v-model.number="octets[0]"
+                                @paste="handlePaste"
+                                :style="getInputStyle(0)"
+                                data-bs-toggle="tooltip"
+                                data-bs-placement="top"
+                                title="You can paste your full IP address into this field!"
+                        />
+                    </div>
+                    <div class="separator">
+                        <span :style="getSeparatorStyle(0)"></span>
+                    </div>
+                    <div class="octet-group">
+                        <input
+                                type="text"
+                                class="octet-input"
+                                v-model.number="octets[1]"
+                                :style="getInputStyle(1)"
+                        />
+                    </div>
+                    <div class="separator">
+                        <span :style="getSeparatorStyle(1)"></span>
+                    </div>
+                    <div class="octet-group">
+                        <input
+                                type="text"
+                                class="octet-input"
+                                v-model.number="octets[2]"
+                                :style="getInputStyle(2)"
+                        />
+                    </div>
+                    <div class="separator">
+                        <span :style="getSeparatorStyle(2)"></span>
+                    </div>
+                    <div class="octet-group">
+                        <input
+                                type="text"
+                                class="octet-input"
+                                v-model.number="octets[3]"
+                                :style="getInputStyle(3)"
+                        />
+                    </div>
+                    <div class="separator">
+                        <span>/</span>
+                    </div>
+                    <div class="octet-group">
+                        <input
+                                type="number"
+                                class="cidr-input"
+                                v-model.number="cidrPrefix"
+                                min="0"
+                                max="32"
+                                data-bs-toggle="tooltip"
+                                data-bs-placement="top"
+                                :title="netmask.join('.')"
+                        />
+                    </div>
+                </div>
+                <!-- Second row: Binary visualization -->
+                <div class="binary-row">
+                    <div class="octet-group">
+                        <div class="octet-bits">
+              <span
+                      v-for="(bitObj, j) in ipBinaries[0]"
+                      :key="'ip-0-' + j"
+                      class="bit ip-bit"
+                      :class="{ masked: bitObj.masked, unmasked: !bitObj.masked }"
+              >
+                {{ bitObj.bit }}
+              </span>
+                        </div>
+                    </div>
+                    <div class="separator">
+                        <span :style="getSeparatorStyle(0)"></span>
+                    </div>
+                    <div class="octet-group">
+                        <div class="octet-bits">
+              <span
+                      v-for="(bitObj, j) in ipBinaries[1]"
+                      :key="'ip-1-' + j"
+                      class="bit ip-bit"
+                      :class="{ masked: bitObj.masked, unmasked: !bitObj.masked }"
+              >
+                {{ bitObj.bit }}
+              </span>
+                        </div>
+                    </div>
+                    <div class="separator">
+                        <span :style="getSeparatorStyle(1)"></span>
+                    </div>
+                    <div class="octet-group">
+                        <div class="octet-bits">
+              <span
+                      v-for="(bitObj, j) in ipBinaries[2]"
+                      :key="'ip-2-' + j"
+                      class="bit ip-bit"
+                      :class="{ masked: bitObj.masked, unmasked: !bitObj.masked }"
+              >
+                {{ bitObj.bit }}
+              </span>
+                        </div>
+                    </div>
+                    <div class="separator">
+                        <span :style="getSeparatorStyle(2)"></span>
+                    </div>
+                    <div class="octet-group">
+                        <div class="octet-bits">
+              <span
+                      v-for="(bitObj, j) in ipBinaries[3]"
+                      :key="'ip-3-' + j"
+                      class="bit ip-bit"
+                      :class="{ masked: bitObj.masked, unmasked: !bitObj.masked }"
+              >
+                {{ bitObj.bit }}
+              </span>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="binary-row">
-              <div class="octet-group">
-                <div class="octet-bits">
-                  <span
-                    v-for="(bitObj, j) in ipBinaries[0]"
-                    :key="'ip-0-' + j"
-                    class="bit ip-bit"
-                    :class="{ masked: bitObj.masked, unmasked: !bitObj.masked }"
-                  >
-                    {{ bitObj.bit }}
-                  </span>
+
+            <div style="text-align: center; width: 100%; margin-top: 10px; font-size: 16px;">
+                <div style="display: inline-block; text-align: left;">
+                    <div class="legend">
+                        <span class="legend-swatch legend-swatch-network"></span>
+                        <span class="legend-text">Network ID portion of the IP address</span>
+                    </div>
+                    <div class="legend">
+                        <span class="legend-swatch legend-swatch-host"></span>
+                        <span class="legend-text">Host ID portion of the IP address</span>
+                    </div>
                 </div>
-              </div>
-              <div class="separator">.</div>
-              <div class="octet-group">
-                <div class="octet-bits">
-                  <span
-                    v-for="(bitObj, j) in ipBinaries[1]"
-                    :key="'ip-1-' + j"
-                    class="bit ip-bit"
-                    :class="{ masked: bitObj.masked, unmasked: !bitObj.masked }"
-                  >
-                    {{ bitObj.bit }}
-                  </span>
-                </div>
-              </div>
-              <div class="separator">.</div>
-              <div class="octet-group">
-                <div class="octet-bits">
-                  <span
-                    v-for="(bitObj, j) in ipBinaries[2]"
-                    :key="'ip-2-' + j"
-                    class="bit ip-bit"
-                    :class="{ masked: bitObj.masked, unmasked: !bitObj.masked }"
-                  >
-                    {{ bitObj.bit }}
-                  </span>
-                </div>
-              </div>
-              <div class="separator">.</div>
-              <div class="octet-group">
-                <div class="octet-bits">
-                  <span
-                    v-for="(bitObj, j) in ipBinaries[3]"
-                    :key="'ip-3-' + j"
-                    class="bit ip-bit"
-                    :class="{ masked: bitObj.masked, unmasked: !bitObj.masked }"
-                  >
-                    {{ bitObj.bit }}
-                  </span>
-                </div>
-              </div>
             </div>
-          </div>
         </div>
 
+        <!-- Summary Section -->
         <table class="summary-table">
-          <tbody>
+            <tbody>
             <tr>
-              <th>Network:</th>
-              <td>{{ network.join('.') }}</td>
+                <th
+                        data-bs-toggle="tooltip"
+                        data-bs-placement="top"
+                        title="The network address refers to the entire subnet."
+                >
+                    Network address:
+                </th>
+                <td>{{ network.join('.') }} / {{ netmask.join('.') }}</td>
             </tr>
             <tr>
-              <th>Host range:</th>
-              <td>{{ firstHost.join('.') }} - {{ lastHost.join('.') }}</td>
+                <th
+                        data-bs-toggle="tooltip"
+                        data-bs-placement="top"
+                        title="These are the usable IP addresses for hosts on this subnet."
+                >
+                    Host range:
+                </th>
+                <td>{{ firstHost.join('.') }} - {{ lastHost.join('.') }}</td>
             </tr>
             <tr>
-              <th>Broadcast:</th>
-              <td>{{ broadcast.join('.') }}</td>
+                <th
+                        data-bs-toggle="tooltip"
+                        data-bs-placement="top"
+                        title="Used to send data to all hosts on the subnet at the same time."
+                >
+                    Broadcast address:
+                </th>
+                <td>{{ broadcast.join('.') }}</td>
             </tr>
-          </tbody>
+            </tbody>
         </table>
 
-        <div class="hosts-container">
-          <h2>{{ hostHeading }}</h2>
-          <div
-            v-if="isTruncated"
-            style="
-              color: #c00;
-              font-weight: bold;
-              text-align: center;
-              margin-bottom: 10px;
-            "
-          >
-            Truncated to {{ TRUNCATION_LIMIT }} addresses
-          </div>
-          <table>
-            <thead>
-              <tr>
-                <th>Bin</th>
-                <th>Dec</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr
-                v-for="(comb, index) in displayedHostCombinations"
-                :key="index"
-              >
-                <td v-html="comb.binaryHTML"></td>
-                <td v-html="comb.decimalHTML"></td>
-              </tr>
-            </tbody>
-          </table>
-          <button
-            class="show-more-btn"
-            v-if="!isTruncated && hostCombinations.length > hostRenderLimit"
-            @click="showMore"
-          >
-            Show more
-          </button>
+        <!-- /31 Special Case Banner -->
+        <div
+                v-if="cidrPrefix === 31"
+                class="alert alert-warning"
+                style="margin: 10px 0;"
+        >
+            <strong>/31 Special Case:</strong>
+            &nbsp;Per
+            <a
+                    href="https://datatracker.ietf.org/doc/html/rfc3021"
+                    target="_blank"
+            >
+                RFC&nbsp;3021
+            </a>,
+            a /31 subnet is used for point-to-point links. Both IPs are valid endpoints; there is no separate network or
+            broadcast address.
         </div>
-      </div>
-    </div>
 
-    <!-- Include Bootstrap JS bundle (with Popper) -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
-    <script>
-      const TRUNCATION_LIMIT = 65536;
-      const app = Vue.createApp({
-        data() {
+        <!-- /32 Special Case Banner -->
+        <div
+                v-if="cidrPrefix === 32"
+                class="alert alert-info"
+                style="margin: 10px 0;"
+        >
+            <strong>/32 Single-Host Subnet:</strong>
+            &nbsp;This subnet contains exactly one IP address.
+            There is no separate network or broadcast address. Commonly used
+            for loopback interfaces or identifying a single host.
+        </div>
+
+        <!-- Hosts Table -->
+        <div class="hosts-container">
+            <h2>{{ hostHeading }}</h2>
+            <div
+                    v-if="isTruncated"
+                    style="color: #999; font-weight: bold; text-align: center; margin-bottom: 10px;"
+            >
+                (output is truncated to {{ TRUNCATION_LIMIT }} addresses for performance reasons)
+            </div>
+            <table>
+                <thead>
+                <tr>
+                    <th>Binary</th>
+                    <th>Decimal</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr
+                        v-for="(comb, index) in displayedHostCombinations"
+                        :key="index"
+                >
+                    <td v-html="comb.binaryHTML"></td>
+                    <!-- Removed class="d-flex align-items-center" here -->
+                    <td>
+                        <!-- IP in decimal form -->
+                        <span v-html="comb.decimalHTML"></span>
+
+                        <!-- /32 scenario: single IP => Single Host badge -->
+                        <template v-if="cidrPrefix === 32">
+              <span
+                      class="badge bg-primary ms-2"
+                      data-bs-toggle="tooltip"
+                      data-bs-placement="top"
+                      title="A /32 network has exactly one IP address—no separate network or broadcast."
+              >
+                Single Host
+              </span>
+                        </template>
+
+                        <!-- /31 scenario: show Endpoint #1, Endpoint #2 -->
+                        <template v-else-if="cidrPrefix === 31">
+              <span
+                      v-if="index === 0"
+                      class="badge bg-primary ms-2"
+                      data-bs-toggle="tooltip"
+                      data-bs-placement="top"
+                      title="First IP in a /31 subnet is used by the first endpoint."
+              >
+                Endpoint #1
+              </span>
+                            <span
+                                    v-if="index === displayedHostCombinations.length - 1"
+                                    class="badge bg-primary ms-2"
+                                    data-bs-toggle="tooltip"
+                                    data-bs-placement="top"
+                                    title="Second IP in a /31 subnet is used by the second endpoint."
+                            >
+                Endpoint #2
+              </span>
+                        </template>
+
+                        <!-- All other prefixes: Network / Gateway / Broadcast -->
+                        <template v-else>
+              <span
+                      v-if="index === 0"
+                      class="badge bg-danger ms-2"
+                      data-bs-toggle="tooltip"
+                      data-bs-placement="top"
+                      title="Used to refer to the entire network. Can't be assigned to any host"
+              >
+                Network
+              </span>
+                            <span
+                                    v-if="index === 1"
+                                    class="badge bg-info ms-2"
+                                    data-bs-toggle="tooltip"
+                                    data-bs-placement="top"
+                                    title="This first usable IP address in the range is usually, but not always, assigned to a gateway to other networks (a router)"
+                            >
+                Gateway
+              </span>
+                            <span
+                                    v-if="index === displayedHostCombinations.length - 1"
+                                    class="badge bg-danger ms-2"
+                                    data-bs-toggle="tooltip"
+                                    data-bs-placement="top"
+                                    title="This IP can be used to send a packet to the subnet that all hosts can see"
+                            >
+                Broadcast
+              </span>
+                        </template>
+                    </td>
+                </tr>
+
+                </tbody>
+            </table>
+            <button
+                    class="show-more-btn"
+                    v-if="hostCombinations.length > hostRenderLimit"
+                    @click="showMore"
+            >
+                Show more
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Include Bootstrap JS and Vue -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+<script>
+  const TRUNCATION_LIMIT = 65536
+  const app = Vue.createApp({
+    data () {
+      return {
+        octets: [192, 168, 1, 0],
+        cidrPrefix: 24,
+        hostRenderLimit: 300,
+        TRUNCATION_LIMIT,
+      }
+    },
+    computed: {
+      hostHeading () {
+        const total = this.totalHosts
+        return total === 1 ? '1 host' : `${total} hosts`
+      },
+      ipBinaries () {
+        return this.octets.map((octet, i) => {
+          const binary = octet.toString(2).padStart(8, '0')
+          let bits = []
+          for (let j = 0; j < 8; j++) {
+            const masked =
+              this.cidrPrefix > i * 8 &&
+              j < this.cidrPrefix - i * 8
+            bits.push({ bit: binary[j], masked })
+          }
+          return bits
+        })
+      },
+      netmask () {
+        const fullMask = Math.pow(2, 32) - 1
+        const shiftBits = 32 - this.cidrPrefix
+        const netmaskNum = fullMask - (Math.pow(2, shiftBits) - 1)
+        return [
+          (netmaskNum >>> 24) & 255,
+          (netmaskNum >>> 16) & 255,
+          (netmaskNum >>> 8) & 255,
+          netmaskNum & 255,
+        ]
+      },
+      network () {
+        return this.octets.map(
+          (octet, i) => octet & this.netmask[i]
+        )
+      },
+      broadcast () {
+        return this.octets.map(
+          (octet, i) => octet | (255 - this.netmask[i])
+        )
+      },
+      firstHost () {
+        if (this.cidrPrefix < 31) {
+          let net = [...this.network]
+          net[3] += 1
+          return net
+        }
+        return this.network
+      },
+      lastHost () {
+        if (this.cidrPrefix < 31) {
+          let bc = [...this.broadcast]
+          bc[3] -= 1
+          return bc
+        }
+        return this.broadcast
+      },
+      totalHosts () {
+        const total = Math.pow(2, 32 - this.cidrPrefix)
+        // /31 => 2 usable hosts (RFC 3021), /32 => 1 host
+        return this.cidrPrefix <= 30 ? total - 2 : total
+      },
+      networkInt () {
+        const net = this.network
+        return (
+          ((net[0] << 24) |
+            (net[1] << 16) |
+            (net[2] << 8) |
+            net[3]) >>> 0
+        )
+      },
+      isTruncated () {
+        return this.hostCombinationsTotal > this.TRUNCATION_LIMIT
+      },
+      hostCombinationsTotal () {
+        const hostBits = 32 - this.cidrPrefix
+        return hostBits > 0 ? 1 << hostBits : 1
+      },
+      actualCombinationsCount () {
+        return Math.min(this.hostCombinationsTotal, this.TRUNCATION_LIMIT)
+      },
+      hostCombinations () {
+        let combos = []
+        for (let i = 0; i < this.actualCombinationsCount; i++) {
+          const fullIPInt = this.networkInt + i
+          combos.push({
+            binaryHTML: this.formatIPBinary(fullIPInt),
+            decimalHTML: this.formatIPDecimal(fullIPInt),
+          })
+        }
+        return combos
+      },
+      displayedHostCombinations () {
+        return this.hostCombinations.slice(0, this.hostRenderLimit)
+      },
+    },
+    methods: {
+      handlePaste (event) {
+        event.preventDefault()
+        const clipboardData = event.clipboardData || window.clipboardData
+        const pastedText = clipboardData.getData('text')
+        this.parseAndFillIPCIDR(pastedText)
+      },
+      parseAndFillIPCIDR (text) {
+        const cidrRegex =
+          /^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})(\/(\d{1,2}))?$/
+        const match = text.trim().match(cidrRegex)
+        if (match) {
+          const newOctets = [
+            parseInt(match[1], 10),
+            parseInt(match[2], 10),
+            parseInt(match[3], 10),
+            parseInt(match[4], 10),
+          ]
+          if (newOctets.every((o) => !isNaN(o) && o >= 0 && o <= 255)) {
+            this.octets = newOctets
+            if (match[6]) {
+              const newPrefix = parseInt(match[6], 10)
+              if (!isNaN(newPrefix) && newPrefix >= 0 && newPrefix <= 32) {
+                this.cidrPrefix = newPrefix
+              }
+            }
+          }
+        }
+      },
+      formatIPBinary (ipInt) {
+        let binStr = ipInt.toString(2).padStart(32, '0')
+        let result = ''
+        for (let i = 0; i < 4; i++) {
+          let octetStart = i * 8
+          let octetEnd = octetStart + 8
+          let octet = binStr.slice(octetStart, octetEnd)
+
+          if (octetEnd <= this.cidrPrefix) {
+            // Entire octet is network portion
+            result += `<span style="background-color:#c8c8c8;">${octet}</span>`
+          } else if (octetStart >= this.cidrPrefix) {
+            // Entire octet is host portion
+            result += `<span style="color:black;">${octet}</span>`
+          } else {
+            // Partially masked
+            let netPart = octet.slice(0, this.cidrPrefix - octetStart)
+            let hostPart = octet.slice(this.cidrPrefix - octetStart)
+            result += `<span style="background-color:#c8c8c8;">${netPart}</span>` +
+              `<span style="color:black;">${hostPart}</span>`
+          }
+
+          if (i < 3) {
+            // Dot between octets
+            if ((i + 1) * 8 <= this.cidrPrefix) {
+              result += `<span style="background-color:#c8c8c8;">.</span>`
+            } else {
+              result += `<span style="color:black;">.</span>`
+            }
+          }
+        }
+        return result
+      },
+      formatIPDecimal (ipInt) {
+        const a = (ipInt >>> 24) & 255
+        const b = (ipInt >>> 16) & 255
+        const c = (ipInt >>> 8) & 255
+        const d = ipInt & 255
+        const octets = [a, b, c, d]
+
+        let result = ''
+        for (let i = 0; i < 4; i++) {
+          const startBit = i * 8
+          const endBit = startBit + 8
+
+          if (this.cidrPrefix >= endBit) {
+            // Entire octet = network portion
+            result += `<span style="background-color: #c8c8c8;">${octets[i]}</span>`
+          } else if (this.cidrPrefix <= startBit) {
+            // Entire octet = host portion
+            result += `<span style="color: black;">${octets[i]}</span>`
+          } else {
+            // Partially masked
+            result += `<span style="background-color: inherit;">${octets[i]}</span>`
+          }
+
+          if (i < 3) {
+            // Dot between octets
+            if (this.cidrPrefix >= (i + 1) * 8) {
+              result += `<span style="background-color: #c8c8c8;">.</span>`
+            } else if (this.cidrPrefix <= i * 8) {
+              result += `<span style="color: black;">.</span>`
+            } else {
+              result += `<span style="background-color: inherit;">.</span>`
+            }
+          }
+        }
+        return result
+      },
+      getSeparatorStyle (index) {
+        if ((index + 1) * 8 <= this.cidrPrefix) {
           return {
-            octets: [192, 168, 1, 0],
-            cidrPrefix: 24,
-            hostRenderLimit: 300,
-            TRUNCATION_LIMIT,
-          };
-        },
-        computed: {
-          hostHeading() {
-            const total = this.totalHosts;
-            return total === 1 ? "1 host" : `${total} hosts`;
-          },
-          ipBinaries() {
-            return this.octets.map((octet, i) => {
-              const binary = octet.toString(2).padStart(8, "0");
-              let bits = [];
-              for (let j = 0; j < 8; j++) {
-                const masked =
-                  this.cidrPrefix > i * 8 && j < this.cidrPrefix - i * 8;
-                bits.push({ bit: binary[j], masked });
-              }
-              return bits;
-            });
-          },
-          netmask() {
-            const fullMask = Math.pow(2, 32) - 1;
-            const shiftBits = 32 - this.cidrPrefix;
-            const netmaskNum = fullMask - (Math.pow(2, shiftBits) - 1);
-            return [
-              (netmaskNum >>> 24) & 255,
-              (netmaskNum >>> 16) & 255,
-              (netmaskNum >>> 8) & 255,
-              netmaskNum & 255,
-            ];
-          },
-          network() {
-            return this.octets.map((octet, i) => octet & this.netmask[i]);
-          },
-          broadcast() {
-            return this.octets.map(
-              (octet, i) => octet | (255 - this.netmask[i])
-            );
-          },
-          firstHost() {
-            if (this.cidrPrefix < 31) {
-              let net = [...this.network];
-              net[3] += 1;
-              return net;
-            }
-            return this.network;
-          },
-          lastHost() {
-            if (this.cidrPrefix < 31) {
-              let bc = [...this.broadcast];
-              bc[3] -= 1;
-              return bc;
-            }
-            return this.broadcast;
-          },
-          totalHosts() {
-            const total = Math.pow(2, 32 - this.cidrPrefix);
-            return this.cidrPrefix <= 30 ? total - 2 : total;
-          },
-          networkInt() {
-            const net = this.network;
-            return (
-              ((net[0] << 24) | (net[1] << 16) | (net[2] << 8) | net[3]) >>> 0
-            );
-          },
-          isTruncated() {
-            return this.hostCombinationsTotal > this.TRUNCATION_LIMIT;
-          },
-          hostCombinationsTotal() {
-            const hostBits = 32 - this.cidrPrefix;
-            return hostBits > 0 ? 1 << hostBits : 1;
-          },
-          actualCombinationsCount() {
-            return Math.min(this.hostCombinationsTotal, this.TRUNCATION_LIMIT);
-          },
-          hostCombinations() {
-            let combos = [];
-            for (let i = 0; i < this.actualCombinationsCount; i++) {
-              const fullIPInt = this.networkInt + i;
-              combos.push({
-                binaryHTML: this.formatIPBinary(fullIPInt),
-                decimalHTML: this.formatIPDecimal(fullIPInt),
-              });
-            }
-            return combos;
-          },
-          displayedHostCombinations() {
-            return this.hostCombinations.slice(0, this.hostRenderLimit);
-          },
-        },
-        methods: {
-          calculateCIDR() {},
-          handlePaste(event) {
-            event.preventDefault();
-            const clipboardData = event.clipboardData || window.clipboardData;
-            const pastedText = clipboardData.getData("text");
-            this.parseAndFillIPCIDR(pastedText);
-          },
-          parseAndFillIPCIDR(text) {
-            const cidrRegex =
-              /^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})(\/(\d{1,2}))?$/;
-            const match = text.trim().match(cidrRegex);
-            if (match) {
-              const newOctets = [
-                parseInt(match[1], 10),
-                parseInt(match[2], 10),
-                parseInt(match[3], 10),
-                parseInt(match[4], 10),
-              ];
-              if (newOctets.every((o) => !isNaN(o) && o >= 0 && o <= 255)) {
-                this.octets = newOctets;
-                if (match[6]) {
-                  const newPrefix = parseInt(match[6], 10);
-                  if (!isNaN(newPrefix) && newPrefix >= 0 && newPrefix <= 32) {
-                    this.cidrPrefix = newPrefix;
-                  }
-                }
-              }
-            }
-          },
-          formatIPBinary(ipInt) {
-            let binStr = ipInt.toString(2).padStart(32, "0");
-            let result = "";
-            for (let i = 0; i < 4; i++) {
-              let octetStart = i * 8;
-              let octetEnd = i * 8 + 8;
-              let octet = binStr.slice(octetStart, octetEnd);
-              if (octetEnd <= this.cidrPrefix) {
-                result +=
-                  `<span style="background-color:#c8c8c8;">${octet}</span>` +
-                  (i < 3 ? "." : "");
-              } else if (octetStart >= this.cidrPrefix) {
-                result +=
-                  `<span style="color:red">${octet}</span>` +
-                  (i < 3 ? "." : "");
-              } else {
-                let netPart = octet.slice(0, this.cidrPrefix - octetStart);
-                let hostPart = octet.slice(this.cidrPrefix - octetStart);
-                result +=
-                  `<span style="background-color:#c8c8c8;">${netPart}</span>` +
-                  `<span style="color:red">${hostPart}</span>` +
-                  (i < 3 ? "." : "");
-              }
-            }
-            return result;
-          },
-          formatIPDecimal(ipInt) {
-            const a = (ipInt >>> 24) & 255;
-            const b = (ipInt >>> 16) & 255;
-            const c = (ipInt >>> 8) & 255;
-            const d = ipInt & 255;
-            const octets = [a, b, c, d];
-            const netOcts = Math.floor(this.cidrPrefix / 8);
-            const remainder = this.cidrPrefix % 8;
-            let parts = [];
-            for (let i = 0; i < 4; i++) {
-              const octetStr = octets[i].toString();
-              if (i < netOcts) {
-                // Fully within the network portion
-                parts.push(
-                  `<span style="background-color:#c8c8c8;">${octetStr}</span>`
-                );
-              } else if (i === netOcts) {
-                if (remainder === 0) {
-                  // For cases like /24, this entire octet is host bits
-                  parts.push(`<span style="color:red;">${octetStr}</span>`);
-                } else {
-                  // Partially network and partially host
-                  const networkPortionLength = Math.round(
-                    octetStr.length * (remainder / 8)
-                  );
-                  const networkPart = octetStr.slice(0, networkPortionLength);
-                  const hostPart = octetStr.slice(networkPortionLength);
-                  parts.push(
-                    `<span style="background-color:#c8c8c8;">${networkPart}</span>` +
-                      `<span style="color:red;">${hostPart}</span>`
-                  );
-                }
-              } else {
-                // Completely within the host portion
-                parts.push(`<span style="color:red;">${octetStr}</span>`);
-              }
-            }
-            return parts.join(".");
-          },
-          showMore() {
-            this.hostRenderLimit += 300;
-          },
-        },
-        mounted() {
-          const tooltipElement = this.$el.querySelector(".cidr-input");
-          this.tooltipInstance = new bootstrap.Tooltip(tooltipElement, {
-            title: () => this.netmask.join("."),
-          });
-        },
-        watch: {
-          cidrPrefix() {
-            // Update the tooltip content whenever cidrPrefix changes
-            if (this.tooltipInstance) {
-              this.tooltipInstance.setContent({
-                ".tooltip-inner": this.netmask.join("."),
-              });
-            }
-          },
-        },
-      });
-      app.mount("#app");
-    </script>
-  </body>
+            'background-color': '#c8c8c8',
+            display: 'inline-block',
+            padding: '0 2px',
+          }
+        }
+        return {
+          color: 'black',
+          display: 'inline-block',
+          padding: '0 2px',
+        }
+      },
+      getInputStyle (index) {
+        const start = index * 8
+        const end = start + 8
+        if (this.cidrPrefix >= end) {
+          return { 'background-color': '#c8c8c8' }
+        } else if (this.cidrPrefix <= start) {
+          return { 'background-color': 'inherit' }
+        } else {
+          // Partly masked octet
+          const networkBits = this.cidrPrefix - start
+          const percentage = (networkBits / 8) * 100
+          return {
+            background: `linear-gradient(to right, #c8c8c8 ${percentage}%, white ${percentage}%)`,
+          }
+        }
+      },
+      showMore () {
+        this.hostRenderLimit += 300
+      },
+    },
+    mounted () {
+      // Initialize a special dynamic tooltip for the CIDR input
+      const cidrInput = this.$el.querySelector('.cidr-input')
+      this.tooltipInstance = new bootstrap.Tooltip(cidrInput, {
+        title: () => this.netmask.join('.'),
+      })
+      // Initialize tooltips for all other elements marked with [data-bs-toggle="tooltip"].
+      const tooltipElements = this.$el.querySelectorAll('[data-bs-toggle="tooltip"]')
+      tooltipElements.forEach(el => {
+        if (el !== cidrInput) {
+          new bootstrap.Tooltip(el)
+        }
+      })
+    },
+    watch: {
+      cidrPrefix () {
+        // Update the tooltip content for the CIDR input
+        if (this.tooltipInstance) {
+          this.tooltipInstance.setContent({
+            '.tooltip-inner': this.netmask.join('.'),
+          })
+        }
+      },
+    },
+  })
+  app.mount('#app')
+</script>
+</body>
 </html>
